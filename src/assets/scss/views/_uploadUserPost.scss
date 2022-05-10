@@ -1,0 +1,64 @@
+.upload-userPost {
+
+  .post {
+    &__text {
+      margin-bottom: 15px;
+
+      h1 {
+        font-weight: $regular;
+        margin-bottom: 10px;
+      }
+    
+      textarea {
+        font-size: 16px;
+        font-weight: $regular;
+        width: 100%;
+        height: 170px;
+        color: $color-primary;
+        border: 2px solid $color-primary;
+        background-color: $color-white;
+        padding: 14px 25px;
+        resize: none ;
+      }
+    }
+
+    &__photo {
+      margin-bottom: 30px;
+
+      &--btn {
+        font-size: 16px;
+        color: $color-white;
+        background-color: $color-primary;
+        text-align: center;
+        padding: 4px 25px;
+        margin-bottom: 25px;
+        cursor: pointer;
+      }
+
+      &--img {
+        height: 160px;
+        color: $color-white;
+        border: 2px solid $color-primary;
+        border-radius: 8px;
+        overflow: hidden;
+      }
+    }
+
+    &__sunbmitBtn {
+      display: flex;
+      justify-content: center;
+
+      button {
+        max-width: 325px;
+        width: 100%;
+      }
+    }
+  }
+
+  .error {
+    line-height: 1.6;
+    color: $color-red;
+    margin-bottom: 15px;
+    text-align: center;
+  }
+}
