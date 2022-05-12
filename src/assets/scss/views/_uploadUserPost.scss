@@ -10,37 +10,52 @@
       }
     
       textarea {
-        font-size: 16px;
+        font-size: 18px;
         font-weight: $regular;
         width: 100%;
         height: 170px;
         color: $color-primary;
         border: 2px solid $color-primary;
         background-color: $color-white;
-        padding: 14px 25px;
+        padding: 14px 18px;
         resize: none ;
       }
     }
 
     &__photo {
       margin-bottom: 30px;
+      
 
       &--btn {
         font-size: 16px;
         color: $color-white;
         background-color: $color-primary;
         text-align: center;
-        padding: 4px 25px;
         margin-bottom: 25px;
-        cursor: pointer;
+
+        label {
+          display: inline-block;
+          padding: 4px 25px;
+          cursor: pointer;
+        }
       }
 
       &--img {
-        height: 160px;
+        height: 200px;
         color: $color-white;
         border: 2px solid $color-primary;
         border-radius: 8px;
         overflow: hidden;
+
+        // 圖片置中對齊
+        margin: auto;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+
+        img {
+          max-width: 100%;
+        }
       }
     }
 
@@ -52,6 +67,10 @@
         max-width: 325px;
         width: 100%;
       }
+    }
+
+    input[type="file"] {
+      display: none;
     }
   }
 

@@ -7,9 +7,14 @@
         <textarea placeholder="輸入您的貼文內容" v-model="content"></textarea>
       </div>
       <div class="post__photo">
-        <button class="post__photo--btn">上傳圖片</button>
+        <button class="post__photo--btn">
+          <label for="upload">
+            上傳圖片
+            <input id="upload" type="file" accept="image/*" @input="handlePreviewImage">
+          </label>
+        </button>
         <div class="post__photo--img">
-          <img src="">
+          <img :src="previewImage">
         </div>
       </div>
       <p class="error" v-if="errorMag">
@@ -35,23 +40,48 @@ export default {
   setup() {
     const content = ref('')
     const store = useStore()
+    const previewImage = ref('')
 
-    const errorMag = computed(() => store.getters.errorMag) 
+    const errorMag = computed(() => store.getters.errorMag)
 
+    // 預覽圖檔
+    function handlePreviewImage (e) {
+      const file = e.target.files[0]
+
+      const reader = new FileReader()
+      reader.readAsDataURL(file)
+      reader.onload =(e => {
+        previewImage.value = e.target.result
+      })
+    }
+
+    
+
+    // 建立貼文
     async function submitPost () {
       try {
         if(content.value==='') {
           const errorTxt = '貼文內容不得為空'
           return store.commit('setErrorMag', errorTxt)
         }
+
+        const paramData = {
+          content: content.value,
+          image: previewImage.value
+        }
+
+        console.log(paramData)
       } catch (error) {
         alert('系統忙碌中，請稍後再試')
       }
     }
 
+
     return {
       content,
       errorMag,
+      previewImage,
+      handlePreviewImage,
       submitPost
     }
   }
