@@ -70,10 +70,11 @@ export default {
 
     function filterPosts () {
       const filterData = {
-        sortTime: sortType.value,
+        timeSort: sortType.value,
         content:  sortContent.value
       }
 
+      sortContent.value = ''
       content.emit('filter-posts', filterData)
     }
 

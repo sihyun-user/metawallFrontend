@@ -1,6 +1,6 @@
 <template>
   <base-card class="post">
-    <base-userHeader :user="user"></base-userHeader>
+    <base-userHeader :user="user" :createdAt="createdAt"></base-userHeader>
     <div class="post__content">
       <p class="post__content-text">
         {{ content }}
@@ -13,7 +13,7 @@
       <div class="post__state-like">
         <i class="fa-regular fa-thumbs-up"></i>
         <!-- <i class="fa-solid fa-thumbs-up"></i> -->
-        <span>12</span>
+        <span>{{ likes }}</span>
       </div>
       <div class="post__state-msg" @click="switchMsgMode">
         <i class="fa-regular fa-comment"></i>
@@ -73,7 +73,7 @@ export default {
     BaseCard,
     BaseUserHeader
   },
-  props: ['user', 'content', 'postImage'],
+  props: ['user', 'likes', 'content', 'postImage', 'createdAt'],
   setup () {
     const msgMode = ref(false)
 
