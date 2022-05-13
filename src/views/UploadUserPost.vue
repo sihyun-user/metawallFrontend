@@ -3,10 +3,6 @@
     <base-caption>張貼動態</base-caption>
     <base-card class="post">
       <div class="post__text">
-        <h1>請填寫用戶ID(測試ID:627dc7f2244ef76fadcf7207)</h1>
-        <input type="text" class="inputMode" placeholder="輸入您的用戶ID(測試API用，可使用api-doc文件生成)" v-model="userID">
-      </div>
-      <div class="post__text">
         <h1>貼文內容</h1>
         <textarea placeholder="輸入您的貼文內容" v-model="content"></textarea>
       </div>
@@ -14,11 +10,11 @@
         <button class="post__photo--btn">
           <label for="upload">
             上傳圖片
-            <input id="upload" type="file" accept="image/*" @input="handlePreviewImage">
+            <input name="image" id="upload" type="file" accept="image/*" @change="handlePreviewImage">
           </label>
         </button>
-        <div class="post__photo--img" v-if="previewImage">
-          <img :src="previewImage">
+        <div class="post__photo--img" v-if="blobImage">
+          <img :src="blobImage">
         </div>
       </div>
       <p class="error" v-if="errorMag">
@@ -27,7 +23,7 @@
         {{ errorMag }}
       </p>
       <div class="post__sunbmitBtn">
-        <button class="baseGrayBtn" @click="submitPost">送出貼文</button>
+        <button class="baseGrayBtn" @click="handleSubmit">送出貼文</button>
       </div>
     </base-card>
   </section>
@@ -35,7 +31,9 @@
 <script>
 import { ref, computed } from 'vue'
 import { useStore } from 'vuex'
+import { useRouter } from 'vue-router'
 import axios from 'axios'
+import handleService from '../service/helpers'
 import BaseCaption from '../components/ui/BaseCaption.vue'
 import BaseCard from '../components/ui/BaseCard.vue'
 export default {
@@ -43,55 +41,114 @@ export default {
     BaseCaption, BaseCard
   },
   setup() {
-    const content = ref('')
+    const router = useRouter()
     const store = useStore()
-    const previewImage = ref(null)
-    const userID = ref('') // API測試用
+    const imageFile = ref(null)
+    const blobImage = ref(null)
+    const content = ref('')
+    const imageLink = ref('')
 
     const errorMag = computed(() => store.getters.errorMag)
 
     // 預覽圖檔
     function handlePreviewImage (e) {
-      const file = e.target.files[0]
-
-      const reader = new FileReader()
-      reader.readAsDataURL(file)
-      reader.onload =(e => {
-        previewImage.value = e.target.result
-      })
+      imageFile.value = e.target.files[0];
+      blobImage.value = URL.createObjectURL(imageFile.value)
     }
 
-    // 建立貼文
-    async function submitPost () {
+    // 檢查送出貼文格式
+    function checkedPost () {
+      if (content.value==='') {
+        const errorTxt = '貼文內容不得為空'
+        store.commit('setErrorMag', errorTxt)
+        return false
+      } else if (imageFile.value !== null) {
+        const fileSize = Math.ceil(imageFile.value.size/1024) // KB
+
+        if (fileSize > 100) {
+          const errorTxt = '圖片檔案過大，僅限 1mb 以下檔案'
+          store.commit('setErrorMag', errorTxt)
+          return false
+        }
+      }
+
+      return true
+    }
+
+    // 上傳貼文圖片
+    async function uploadImage () {
       try {
-        if(content.value==='' || userID.value==='') {
-          const errorTxt = '貼文內容或用戶ID不得為空'
-          return store.commit('setErrorMag', errorTxt)
+        const formData = new FormData()
+        formData.append('image', imageFile.value)
+
+        const api = `${process.env.VUE_APP_API}/uploads`
+        const response = await axios.post(api, formData, {
+          headers: {
+            'Content-Type': 'multipart/form-data'
+          }
+        })
+
+        return response
+      } catch (error) {
+        console.log(error)
+      }
+    }
+
+    // 創建貼文
+    async function craetPost () {
+      const paramData = {
+        content: content.value,
+        user: process.env.VUE_APP_USER_ID,
+        image: imageLink.value
+      }
+
+      const api = `${process.env.VUE_APP_API}/posts`
+      const response = await axios.post(api, paramData)
+
+      return response
+    }
+
+    async function handleSubmit () {
+      try {
+        // 1) 檢查送出貼文格式
+        const checkOk = checkedPost()
+        if (!checkOk) return
+
+        // 2) 上傳貼文圖片
+        if (imageFile.value) {
+          const uploadRespone = await uploadImage()
+          if (!uploadRespone.status) {
+            handleService.checkConsole('上傳貼文圖片失敗', uploadRespone.data)
+            throw Error
+          } else {
+            imageLink.value = uploadRespone.data.data.url
+            handleService.checkConsole('上傳貼文圖片成功', uploadRespone.data)
+          }
         }
 
-        const paramData = {
-          content: content.value,
-          image: previewImage.value,
-          user: userID.value
+        // 3) 創建貼文
+        const createRespone = await craetPost()
+        if (!createRespone.status) {
+          handleService.checkConsole('創建貼文失敗', createRespone.data)
+          throw Error
+        } else {
+          handleService.checkConsole('創建貼文成功', createRespone.data)
+
+          alert('貼文創建成功')
+          router.push('/posts-wall')
         }
-
-        const api = `${process.env.VUE_APP_API}/posts`
-        const response = await axios.post(api, paramData)
-
-        console.log(response)
+        
       } catch (error) {
         alert('系統忙碌中，請稍後再試')
       }
     }
 
-
     return {
       content,
+      blobImage,
       errorMag,
-      previewImage,
-      userID,
       handlePreviewImage,
-      submitPost
+      handleSubmit
     }
   }
 }

@@ -78,6 +78,7 @@
     height: 46px;
     border: 2px solid $color-primary;
     display: flex;
+    background-color: $color-secondary;
 
     @include mobile {
       width: 100%;
