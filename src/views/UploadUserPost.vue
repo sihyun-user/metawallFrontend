@@ -3,6 +3,10 @@
     <base-caption>張貼動態</base-caption>
     <base-card class="post">
       <div class="post__text">
+        <h1>請填寫用戶ID(測試ID:627dc7f2244ef76fadcf7207)</h1>
+        <input type="text" class="inputMode" placeholder="輸入您的用戶ID(測試API用，可使用api-doc文件生成)" v-model="userID">
+      </div>
+      <div class="post__text">
         <h1>貼文內容</h1>
         <textarea placeholder="輸入您的貼文內容" v-model="content"></textarea>
       </div>
@@ -13,7 +17,7 @@
             <input id="upload" type="file" accept="image/*" @input="handlePreviewImage">
           </label>
         </button>
-        <div class="post__photo--img">
+        <div class="post__photo--img" v-if="previewImage">
           <img :src="previewImage">
         </div>
       </div>
@@ -31,6 +35,7 @@
 <script>
 import { ref, computed } from 'vue'
 import { useStore } from 'vuex'
+import axios from 'axios'
 import BaseCaption from '../components/ui/BaseCaption.vue'
 import BaseCard from '../components/ui/BaseCard.vue'
 export default {
@@ -40,7 +45,8 @@ export default {
   setup() {
     const content = ref('')
     const store = useStore()
-    const previewImage = ref('')
+    const previewImage = ref(null)
+    const userID = ref('') // API測試用
 
     const errorMag = computed(() => store.getters.errorMag)
 
@@ -55,22 +61,24 @@ export default {
       })
     }
 
-    
-
     // 建立貼文
     async function submitPost () {
       try {
-        if(content.value==='') {
-          const errorTxt = '貼文內容不得為空'
+        if(content.value==='' || userID.value==='') {
+          const errorTxt = '貼文內容或用戶ID不得為空'
           return store.commit('setErrorMag', errorTxt)
         }
 
         const paramData = {
           content: content.value,
-          image: previewImage.value
+          image: previewImage.value,
+          user: userID.value
         }
 
-        console.log(paramData)
+        const api = `${process.env.VUE_APP_API}/posts`
+        const response = await axios.post(api, paramData)
+
+        console.log(response)
       } catch (error) {
         alert('系統忙碌中，請稍後再試')
       }
@@ -81,6 +89,7 @@ export default {
       content,
       errorMag,
       previewImage,
+      userID,
       handlePreviewImage,
       submitPost
     }

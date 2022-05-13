@@ -9,7 +9,7 @@ import UploadUserPost from '../views/UploadUserPost'
 import UserCenter from '../views/UserCenter'
 
 const routes = [
-  { path: '/', redirect: '/auth' },
+  { path: '/', redirect: '/posts-wall' },
   { path: '/auth', component: UserAuth },
   {
     path: '/posts-wall',

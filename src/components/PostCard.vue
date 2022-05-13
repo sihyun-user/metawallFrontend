@@ -6,7 +6,7 @@
         {{ content }}
       </p>
       <div class="post__content-img" v-if="postImage">
-        貼文圖片
+        <img :src="postImage">
       </div>
     </div>
     <div class="post__state">

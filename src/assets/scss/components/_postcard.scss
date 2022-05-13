@@ -12,11 +12,17 @@
 
     &-img {
       width: 100%;
-      height: 157px;
-      line-height: 157px;
       border: 2px solid $color-primary;
       border-radius: 8px;
-      text-align: center;
+      overflow: hidden;
+
+      img {
+        width: 100%;
+        height: 400px;
+        display: block;
+        object-fit: cover;
+        object-position: center;
+      }
     }
   }
 

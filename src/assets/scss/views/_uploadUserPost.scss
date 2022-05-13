@@ -41,20 +41,16 @@
       }
 
       &--img {
-        height: 200px;
-        color: $color-white;
+        width: 100%;
         border: 2px solid $color-primary;
         border-radius: 8px;
         overflow: hidden;
 
-        // 圖片置中對齊
-        margin: auto;
-        display: flex;
-        justify-content: center;
-        align-items: center;
-
         img {
-          max-width: 100%;
+          height: 200px;
+          display: block;
+          object-fit: cover;
+          object-position: center;
         }
       }
     }
