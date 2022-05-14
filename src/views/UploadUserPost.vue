@@ -78,7 +78,7 @@ export default {
         const formData = new FormData()
         formData.append('image', imageFile.value)
 
-        const api = `${process.env.VUE_APP_API}/uploads`
+        const api = `${process.env.VUE_APP_API}/api/uploads`
         const response = await axios.post(api, formData, {
           headers: {
             'Content-Type': 'multipart/form-data'
@@ -105,7 +105,7 @@ export default {
           image: imageLink.value
         }
   
-        const api = `${process.env.VUE_APP_API}/posts`
+        const api = `${process.env.VUE_APP_API}/api/posts`
         const response = await axios.post(api, paramData)
   
         if (!response.status) throw Error

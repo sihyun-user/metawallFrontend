@@ -52,7 +52,7 @@ export default {
         store.commit('setIsLoading', true)
 
         const query = `timeSort=${sort.timeSort}&q=${sort.content}`
-        const api = `${process.env.VUE_APP_API}/posts?${query}`
+        const api = `${process.env.VUE_APP_API}/api/posts?${query}`
         const res = await axios.get(api)
   
         store.commit('setIsLoading', false)
