@@ -95,6 +95,7 @@ export default {
         return 'ok'
       } catch (error) {
         alert('系統忙碌中，請稍後再試')
+        store.commit('setIsLoading', false)
       }
     }
 
@@ -118,6 +119,7 @@ export default {
         handleService.checkConsole('創建貼文成功', response.data)
       } catch (error) {
         alert('系統忙碌中，請稍後再試')
+        store.commit('setIsLoading', false)
       }
     }
 
