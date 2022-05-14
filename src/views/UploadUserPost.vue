@@ -1,5 +1,5 @@
 <template>
-  <section class="upload-userPost">
+  <section class="upload-userPost" v-if="!isLoading">
     <base-caption>張貼動態</base-caption>
     <base-card class="post">
       <div class="post__text">
@@ -25,6 +25,7 @@
       </div>
     </base-card>
   </section>
+  <base-spinner v-else></base-spinner>
 </template>
 <script>
 import { ref, computed } from 'vue'
@@ -47,6 +48,7 @@ export default {
     const imageLink = ref('')
 
     const errorMag = computed(() => store.getters.errorMag)
+    const isLoading = computed(() => store.getters.isLoading)
 
     // 預覽圖檔
     function handlePreviewImage (e) {
@@ -104,12 +106,13 @@ export default {
           user: process.env.VUE_APP_USER_ID,
           image: imageLink.value
         }
-  
+
         const api = `${process.env.VUE_APP_API}/api/posts`
         const response = await axios.post(api, paramData)
-  
+        store.commit('setIsLoading', false)
+
         if (!response.status) throw Error
-          
+
         alert('貼文創建成功')
         router.push('/posts-wall')
         handleService.checkConsole('創建貼文成功', response.data)
@@ -122,8 +125,10 @@ export default {
       // 1) 檢查送出貼文格式
       const checkOk = checkedPost()
       if (!checkOk) return
-      
+
       // 2) 上傳貼文圖片 & 創建貼文
+      store.commit('setIsLoading', true)
+
       if (!imageFile.value) {
         craetPost()
       } else {
@@ -136,6 +141,7 @@ export default {
       content,
       blobImage,
       errorMag,
+      isLoading,
       handlePreviewImage,
       handleSubmit
     }
