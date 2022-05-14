@@ -18,8 +18,6 @@
         </div>
       </div>
       <p class="error" v-if="errorMag">
-        <!-- 圖片檔案過大，僅限 1mb 以下檔案<br>
-        圖片格式錯誤，僅限 JPG、PNG 圖片 -->
         {{ errorMag }}
       </p>
       <div class="post__sunbmitBtn">
@@ -71,7 +69,6 @@ export default {
           return false
         }
       }
-
       return true
     }
 
@@ -88,58 +85,50 @@ export default {
           }
         })
 
-        return response
+        if (!response.status) throw Error
+
+        imageLink.value = response.data.data.url
+        handleService.checkConsole('上傳貼文圖片成功', response.data)
+
+        return 'ok'
       } catch (error) {
-        console.log(error)
+        alert('系統忙碌中，請稍後再試')
       }
     }
 
     // 創建貼文
     async function craetPost () {
-      const paramData = {
-        content: content.value,
-        user: process.env.VUE_APP_USER_ID,
-        image: imageLink.value
+      try {
+        const paramData = {
+          content: content.value,
+          user: process.env.VUE_APP_USER_ID,
+          image: imageLink.value
+        }
+  
+        const api = `${process.env.VUE_APP_API}/posts`
+        const response = await axios.post(api, paramData)
+  
+        if (!response.status) throw Error
+          
+        alert('貼文創建成功')
+        router.push('/posts-wall')
+        handleService.checkConsole('創建貼文成功', response.data)
+      } catch (error) {
+        alert('系統忙碌中，請稍後再試')
       }
-
-      const api = `${process.env.VUE_APP_API}/posts`
-      const response = await axios.post(api, paramData)
-
-      return response
     }
 
     async function handleSubmit () {
-      try {
-        // 1) 檢查送出貼文格式
-        const checkOk = checkedPost()
-        if (!checkOk) return
-
-        // 2) 上傳貼文圖片
-        if (imageFile.value) {
-          const uploadRespone = await uploadImage()
-          if (!uploadRespone.status) {
-            handleService.checkConsole('上傳貼文圖片失敗', uploadRespone.data)
-            throw Error
-          } else {
-            imageLink.value = uploadRespone.data.data.url
-            handleService.checkConsole('上傳貼文圖片成功', uploadRespone.data)
-          }
-        }
-
-        // 3) 創建貼文
-        const createRespone = await craetPost()
-        if (!createRespone.status) {
-          handleService.checkConsole('創建貼文失敗', createRespone.data)
-          throw Error
-        } else {
-          handleService.checkConsole('創建貼文成功', createRespone.data)
-
-          alert('貼文創建成功')
-          router.push('/posts-wall')
-        }
-        
-      } catch (error) {
-        alert('系統忙碌中，請稍後再試')
+      // 1) 檢查送出貼文格式
+      const checkOk = checkedPost()
+      if (!checkOk) return
+      
+      // 2) 上傳貼文圖片 & 創建貼文
+      if (!imageFile.value) {
+        craetPost()
+      } else {
+        const uploadResult = await uploadImage()
+        if (uploadResult == 'ok') craetPost()
       }
     }
 
