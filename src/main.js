@@ -4,7 +4,7 @@ import store from './store'
 import App from './App.vue'
 import axios from 'axios'
 import VueAxios from 'vue-axios'
-import './assets/scss/main.scss'
+import '@/assets/scss/main.scss'
 
 import BaseSpinner from './components/ui/BaseSpinner'
 
